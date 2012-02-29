@@ -80,16 +80,16 @@ cookies() ->
     Req:cookies().
 
 cookie(Cookie) when is_atom(Cookie) ->
-	cookie(atom_to_list(Cookie));
+    cookie(atom_to_list(Cookie));
 cookie(Cookie) ->
     Req = request_bridge(),
     Req:cookie(Cookie).
 
 cookie_default(Cookie,DefaultValue) ->
-	case cookie(Cookie) of
-		undefined -> DefaultValue;
-		Value -> Value
-	end.
+    case cookie(Cookie) of
+	undefined -> DefaultValue;
+	Value -> Value
+    end.
 
 cookie(Cookie, Value) ->
     Res = response_bridge(),
@@ -101,8 +101,16 @@ cookie(Cookie, Value, Path, MinutesToLive) ->
     response_bridge(Res:cookie(Cookie, Value, Path, MinutesToLive)),
     ok.
 
+cookie(Cookie, Value, Path, MinutesToLive, Domain) ->
+    Res = response_bridge(),
+    response_bridge(Res:cookie(Cookie, Value, Path, MinutesToLive, Domain)),
+    ok.
+
 delete_cookie(Cookie) ->
-	cookie(Cookie,"","/",0).
+    cookie(Cookie,"","/",0).
+
+delete_cookie(Cookie, Domain) ->
+    cookie(Cookie,"","/",0, Domain).
 
 
 %%% TRANSIENT CONTEXT %%%
