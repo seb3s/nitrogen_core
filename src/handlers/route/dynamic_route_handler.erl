@@ -56,6 +56,9 @@ finish(_Config, State) ->
 route("/") -> 
     {index, []};
 
+route("/ws/") -> 
+    {ws_index, []};
+    
 route(Path) ->
     IsStatic = (filename:extension(Path) /= []),
     case IsStatic of
