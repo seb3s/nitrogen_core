@@ -386,6 +386,26 @@ NitrogenClass.prototype.$urlencode = function(str) {
     return escape(str).replace(/\+/g,'%2B').replace(/%20/g, '+').replace(/\*/g, '%2A').replace(/\//g, '%2F').replace(/@/g, '%40');
 }
 
+NitrogenClass.prototype.$encode_utf8 = function(s) {
+    return unescape(encodeURIComponent(s));
+}
+
+NitrogenClass.prototype.$decode_utf8 = function(s) {
+    return decodeURIComponent(escape(s));
+}
+
+NitrogenClass.prototype.$json_escape = function(str) {
+    return str
+	.replace(/[\\]/g, '\\\\')
+	.replace(/[\"]/g, '\\\"')
+	.replace(/[\/]/g, '\\/')
+	.replace(/[\b]/g, '\\b')
+	.replace(/[\f]/g, '\\f')
+	.replace(/[\n]/g, '\\n')
+	.replace(/[\r]/g, '\\r')
+	.replace(/[\t]/g, '\\t');
+}
+
 /*** DATE PICKER ***/
 
 NitrogenClass.prototype.$datepicker = function(pickerObj, pickerOptions) {
@@ -397,16 +417,19 @@ NitrogenClass.prototype.$autocomplete = function(path, autocompleteOptions, ente
     var n = this;
     jQuery.extend(autocompleteOptions, {
         select: function(ev, ui) {
-          var item = (ui.item) && '{"id":"'+ui.item.id+'","value":"'+ui.item.value+'"}' || '';
-          n.$queue_event(null, selectPostbackInfo, "select_item="+n.$urlencode(item));
+	    var item = (ui.item) && 
+		n.$encode_utf8('{"id":"' + n.$json_escape(ui.item.id) + 
+			       '","value":"' + n.$json_escape(ui.item.value) + '"}') 
+		|| '';
+	    n.$queue_event(null, selectPostbackInfo, "select_item="+n.$urlencode(item));
         },
         source: function(req, res) {
-          n.$queue_event(null, enterPostbackInfo, "search_term="+req.term, {
-              dataType: 'json',
-              success: function(data) {
-                 res(data);
-              }
-          });
+            n.$queue_event(null, enterPostbackInfo, "search_term="+req.term, {
+		dataType: 'json',
+		success: function(data) {
+                    res(data);
+		}
+            });
         }
     });
     jQuery(path).autocomplete(autocompleteOptions);
